@@ -1,100 +1,139 @@
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
+#include "../include/aux.hpp"
 
-namespace graph {
+using namespace std;
 
-int INF = 999999;
+// Devuelve:
+// true si hay arbitraje. Además, devuelve un ciclo donde hay arbitraje en cicloDivisas
+// false si no
+bool arbitrajeBellmanFord(vector<vector<double>> E, vector<int> *cicloDivisas, int nodoInicial)
+{
+	int n = E.size();
 
-typedef std::vector<std::vector<std::pair<int, int>>> adjacencyList;
-//first index selects the node, second one selects a pair.
-//The pair represents destination and weight of an edge.
+	vector<double> distanciasMinimas(n); // Vector de distancias mínimas entre nodoInicial y el resto
+	vector<int> ant(n);
 
+	// Inicializamos el vector de distancias mínimas
+	for (int i = 0; i < n; i++)
+	{
+		distanciasMinimas[i] = E[nodoInicial][i];
+		ant[i] = nodoInicial;
+	}
 
-adjacencyList readGraph() {
-    int vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
-    adjacencyList graph(vertex_count);
-    int from, to, weight;
-    for (int i = 0; i < edge_count; i++) {
-        std::cin >> from >> to >> weight;
-        graph[from].push_back({to, weight});
-    }
-    return graph;
+	int iteraciones = 0;
+	bool hayCambios = true;
+	while (hayCambios && iteraciones < n)
+	{
+		hayCambios = false;
+		for (int u = 0; u < n; u++)
+		{
+			for (int v = 0; v < n; v++)
+			{
+				double peso = E[u][v];
+
+				if (distanciasMinimas[u] + peso < distanciasMinimas[v])
+				{
+					distanciasMinimas[v] = distanciasMinimas[u] + peso;
+					ant[v] = u;
+					hayCambios = true;
+				}
+			}
+		}
+
+		iteraciones++;
+	}
+
+	// Ya ejecutamos Bellman-Ford y nos devolvió un vector de distancias mínimas a nodoInicial
+	// Ahora buscamos nos fijamos si hay ciclos negativos.
+	// Por cómo está modelado el problema en el grafo, esto equivale a detectar si hay arbitraje
+
+	bool hayArbitraje = false;
+
+	if (iteraciones == n)
+	{
+		// Hay ciclos negativos. Entonces hay arbitraje.
+
+		hayArbitraje = true;
+
+		// Buscamos el ciclo negativo (que ya sabemos que existe) y, en particular, vamos a decir
+		// que cualquier nodo de ese ciclo va a ser el primer nodo del ciclo del arbitraje
+		
+		vector<bool> yaPase(n);
+		for (int i = 0; i < n; i++)
+			yaPase[i] = false;
+		int actual = nodoInicial;
+		do
+		{
+			yaPase[actual] = true;
+			actual = ant[actual];
+		} while (!yaPase[actual]);
+
+		int nodoArbitraje = actual;
+
+		// Una vez definido el primer nodo del ciclo del arbitraje, reconstruimos el ciclo
+		// del arbitraje
+
+		int i = nodoArbitraje;
+
+		do
+		{
+			(*cicloDivisas).push_back(i);
+			i = ant[i];
+		} while (i != nodoArbitraje);
+
+		(*cicloDivisas).push_back(nodoArbitraje);
+	}
+
+	return hayArbitraje;
 }
 
-std::vector<int> bellmanFord(const adjacencyList &graph, int source) {
-    //init
-    std::vector<int> distances(graph.size(), INF);
-    distances[source] = 0;
-    for (uint iterations = 0; iterations < graph.size(); ++iterations) {
-        //iterate vertex_count times.
-        bool changed_a_distance = false;
-        //for each iteration we visit all the edges.
-        for (uint i = 0; i < graph.size(); ++i) {
-            for (uint j = 0; j < graph[i].size(); ++j) {
-                //for each edge, if it improves a distance, we record that.
-                int other_vertex = graph[i][j].first;
-                int weight = graph[i][j].second;
-                if (distances[other_vertex] > distances[i] + weight) {
-                    distances[other_vertex] = distances[i] + weight;
-                    changed_a_distance = true;
-                }
-            }
-        }
-        if (!changed_a_distance) break;
-    }
-    return distances;
-}
+int main()
+{
 
+	int cantDivisas = 0;
+	cin >> cantDivisas;
 
-bool hasNegativecycle(const adjacencyList &graph) {
-    //init
-    int source = 0;
-    bool negative_cycle = false;
-    std::vector<int> distances(graph.size(), INF);
-    distances[source] = 0;
-    for (uint iterations = 0; iterations < graph.size(); ++iterations) {
-        //iterate vertex_count times.
-        bool changed_a_distance = false;
-        //for each iteration we visit all the edges.
-        for (uint i = 0; i < graph.size(); ++i) {
-            for (uint j = 0; j < graph[i].size(); ++j) {
-                //for each edge, if it improves a distance, we record that.
-                int other_vertex = graph[i][j].first;
-                int weight = graph[i][j].second;
-                //Here is where we have to modify to make it
-                //work with multiplication instead of addition.
-                if (distances[other_vertex] > distances[i] + weight) {
-                    distances[other_vertex] = distances[i] + weight;
-                    changed_a_distance = true;
-                }
-            }
-            if (!changed_a_distance) break;
-        }
-        //check for negative cycles, over all edges.
-        for (uint i = 0; i < graph.size(); ++i) {
-            for (uint j = 0; j < graph[i].size(); ++j) {
-                //for each edge, if it improves a distance, we record that.
-                int other_vertex = graph[i][j].first;
-                int weight = graph[i][j].second;
-                if (distances[other_vertex] > distances[i] + weight) {
-                    negative_cycle = true;
-                }
-            }
-        }
-        //return negative_cycle;
-    }
-    return negative_cycle;
+	if (cantDivisas < 0)
+	{
+		cerr << "La cantidad de divisas debe ser no negativa." << endl;
+		return -1;
+	}
 
-}
+	vector<vector<double>> cambiosDivisas(cantDivisas);
 
+	for (int i = 0; i < cantDivisas; i++)
+	{
+		cambiosDivisas[i] = vector<double>(cantDivisas);
 
-}//end of namespace
-int main() {
-    //Init.
-    graph::adjacencyList g = graph::readGraph();
+		for (int j = 0; j < cantDivisas; j++)
+		{
+			cin >> cambiosDivisas[i][j];
+		}
+	}
 
-    //Bellman-Ford:
-    std::vector<int> res = graph::bellmanFord(g, 0);
-    for (int i : res) std::cout << i << std::endl;
+	// Convertimos la matriz de cambios de divisas a una matriz de sucesores para
+	// adaptarnos al modelo de grafo que usamos
+	vector<vector<double>> E = preProcesarDivisas(cambiosDivisas);
+
+	vector<int> cicloDivisas(0);
+	bool hayArbitraje = arbitrajeBellmanFord(E, &cicloDivisas, 0);
+
+	if (hayArbitraje)
+	{
+		cout << "SI";
+
+		for (int i = 0; i < cicloDivisas.size(); i++)
+		{
+			cout << " " << cicloDivisas[i];
+		}
+	}
+	else
+	{
+		cout << "NO";
+	}
+
+	cout << endl;
+
+	return 0;
 }

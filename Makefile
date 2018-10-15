@@ -4,11 +4,13 @@ CXXFLAGS      = $(COMPILE_FLAGS)
 LIBS          = 
 DEL_FILE      = rm -f
 
-OBJECTS_CLUSTERIZACION_PRIM						= 	clusterizacion-prim.o
-#OBJECTS_CLUSTERIZACION_KRUSKAL					= 	clusterizacion-kruskal.o
+OBJECTS_CLUSTERIZACION_PRIM							= 	clusterizacion-prim.o
+#OBJECTS_CLUSTERIZACION_KRUSKAL						= 	clusterizacion-kruskal.o
 #OBJECTS_CLUSTERIZACION_KRUSKAL_PATH_COMPRESSION	= 	clusterizacion-kruskal-path-compression.o
-OBJECTS_ARBITRAJE_BELLMAN_FORD					= 	arbitraje-bellman-ford.o
-OBJECTS_ARBITRAJE_FLOYD							= 	arbitraje-floyd.o
+OBJECTS_ARBITRAJE_BELLMAN_FORD						= 	arbitraje-bellman-ford.o \
+														aux.o
+OBJECTS_ARBITRAJE_FLOYD								= 	arbitraje-floyd.o \
+														aux.o
 
 TARGET_CLUSTERIZACION_PRIM						= 	clusterizacion-prim
 #TARGET_CLUSTERIZACION_KRUSKAL					= 	clusterizacion-kruskal
@@ -63,3 +65,6 @@ $(TARGET_ARBITRAJE_BELLMAN_FORD).o: src/arbitraje/$(TARGET_ARBITRAJE_BELLMAN_FOR
 
 $(TARGET_ARBITRAJE_FLOYD).o: src/arbitraje/$(TARGET_ARBITRAJE_FLOYD).cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $(TARGET_ARBITRAJE_FLOYD).o src/arbitraje/$(TARGET_ARBITRAJE_FLOYD).cpp
+
+aux.o: src/aux.cpp src/include/aux.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o aux.o src/aux.cpp
