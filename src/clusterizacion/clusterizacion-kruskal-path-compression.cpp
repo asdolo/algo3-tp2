@@ -5,6 +5,11 @@
 #include <string>
 using namespace std;
 
+struct subset 
+{ 
+    int parent; 
+    int rank; 
+}; 
 bool noPertenece(vector< tuple<int, int, int> > res,int x,int y){
     for(int i=0;i<res.size();i++){
         if( (get<0>(res[i]) == x && get<1>(res[i]) == y) || (get<0>(res[i]) == y && get<1>(res[i]) == x) ) return false;
@@ -21,6 +26,7 @@ vector< tuple<int, int, int> > obtenerListaDeAristas(vector< vector<double> > E)
             }
         }
     }
+
     return res;
 }
 bool sortbyth(const tuple<int, int, int>& a,  
@@ -29,22 +35,38 @@ bool sortbyth(const tuple<int, int, int>& a,
     return (get<2>(a) < get<2>(b)); 
 } 
 
-int FIND(int u, vector<int>& representantes){
-    return representantes[u];
+int FIND(int u, vector<subset>& subsets){
+    if (subsets[u].parent != u) 
+        subsets[u].parent = FIND(subsets[u].parent,subsets); 
+  
+    return subsets[u].parent; 
 }
-void UNION(int u,int v,vector<int>& representantes){
-    int x = representantes[v];
-    for(int i = 0; i < representantes.size(); i++)
-    {
-        if(representantes[i]==x) representantes[i]=representantes[u];
+void UNION(int u,int v,vector<subset>& subsets){
+    int xroot = FIND(u, subsets); 
+    int yroot = FIND(v, subsets); 
+
+    if (subsets[xroot].rank < subsets[yroot].rank) {
+        subsets[xroot].parent = yroot; 
     }
+    else if (subsets[xroot].rank > subsets[yroot].rank) {
+        subsets[yroot].parent = xroot; 
+    }
+    else
+    { 
+        subsets[yroot].parent = xroot; 
+        subsets[xroot].rank++; 
+    } 
     
 }
 vector< vector<double> >  kruskal(vector< vector<double> > E){
-    vector<int> representantes;
-    //Creo el vector de representantes
+    //Creo los structs subset para union-find con path compression
+    vector<subset> subsets;
+    //Inicializo los subsets
     for(int i=0;i<E[0].size();i++){
-        representantes.push_back(i);
+        struct subset s;
+        s.parent=i;
+        s.rank=0;
+        subsets.push_back(s);
     }
     
     vector< tuple<int, int, int> > agm;
@@ -53,9 +75,9 @@ vector< vector<double> >  kruskal(vector< vector<double> > E){
 
     for(int i =0;i<listaDeAristas.size();i++){
         tuple<int, int, int> arista = listaDeAristas[i];
-        if(FIND(get<0>(arista),representantes) != FIND(get<1>(arista),representantes)){
+        if(FIND(get<0>(arista),subsets) != FIND(get<1>(arista),subsets)){
             agm.push_back(arista);
-            UNION(get<0>(arista),get<1>(arista),representantes);
+            UNION(get<0>(arista),get<1>(arista),subsets);
         }
     }
     //Ya tengo el AGM en res. Lo paso a matriz de adyacencia

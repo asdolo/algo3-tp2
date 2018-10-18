@@ -107,17 +107,30 @@ void UNION(int u,int v,vector<int>& representantes){
     }
     
 }
-vector< tuple<int, int, int> > kruskal(vector< vector<double> > E,vector<int>& representantes){
-    vector< tuple<int, int, int> > res;
+vector< vector<double> >  kruskal(vector< vector<double> > E){
+    vector<int> representantes;
+    //Creo el vector de representantes
+    for(int i=0;i<E[0].size();i++){
+        representantes.push_back(i);
+    }
+    
+    vector< tuple<int, int, int> > agm;
     vector< tuple<int, int, int> > listaDeAristas = obtenerListaDeAristas(E);
     sort(listaDeAristas.begin(), listaDeAristas.end(), sortbyth); 
 
     for(int i =0;i<listaDeAristas.size();i++){
         tuple<int, int, int> arista = listaDeAristas[i];
         if(FIND(get<0>(arista),representantes) != FIND(get<1>(arista),representantes)){
-            res.push_back(arista);
+            agm.push_back(arista);
             UNION(get<0>(arista),get<1>(arista),representantes);
         }
+    }
+    //Ya tengo el AGM en res. Lo paso a matriz de adyacencia
+    vector< vector<double> > res(E[0].size(),vector<double>(E[0].size(),-1));
+    for(int i=0;i<agm.size();i++){
+        tuple<int, int, int> arista = agm[i];
+        res[get<0>(arista)][get<1>(arista)]=get<2>(arista);
+        res[get<1>(arista)][get<0>(arista)]=get<2>(arista);
     }
     return res;
 }
@@ -164,13 +177,17 @@ int main()
     agm[15][16]=11;
     agm[16][15]=11;
     bool b =isConsistentEdge(agm,6,7,2,1);
-    vector<int> representantes(17,-1);
-    for(int i = 0; i < representantes.size(); i++)
-    {
-        representantes[i]=i;
-    }
+
     agm[0][12]=4;
     agm[12][0]=4;
-    vector< tuple<int, int, int> > res = kruskal(agm,representantes);
+    vector< vector<double> > res = kruskal(agm);
+    for (int i = 0; i < res[0].size(); i++)
+    {
+        for (int j = 0; j < res[0].size(); j++)
+        {
+            cout << "("<<i<<","<<j<<","<<res[i][j]<<")"<<"  ";
+        }
+        cout << endl;
+    }
     return 0; 
 } 
