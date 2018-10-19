@@ -4,17 +4,20 @@ CXXFLAGS      = $(COMPILE_FLAGS)
 LIBS          = 
 DEL_FILE      = rm -f
 
-OBJECTS_CLUSTERIZACION_PRIM							= 	clusterizacion-prim.o
-#OBJECTS_CLUSTERIZACION_KRUSKAL						= 	clusterizacion-kruskal.o
-#OBJECTS_CLUSTERIZACION_KRUSKAL_PATH_COMPRESSION	= 	clusterizacion-kruskal-path-compression.o
+OBJECTS_CLUSTERIZACION_PRIM							= 	clusterizacion-prim.o \
+														aux.o
+OBJECTS_CLUSTERIZACION_KRUSKAL						= 	clusterizacion-kruskal.o \
+														aux.o
+OBJECTS_CLUSTERIZACION_KRUSKAL_PATH_COMPRESSION		= 	clusterizacion-kruskal-path-compression.o \
+														aux.o
 OBJECTS_ARBITRAJE_BELLMAN_FORD						= 	arbitraje-bellman-ford.o \
 														aux.o
 OBJECTS_ARBITRAJE_FLOYD								= 	arbitraje-floyd.o \
 														aux.o
 
 TARGET_CLUSTERIZACION_PRIM						= 	clusterizacion-prim
-#TARGET_CLUSTERIZACION_KRUSKAL					= 	clusterizacion-kruskal
-#TARGET_CLUSTERIZACION_KRUSKAL_PATH_COMPRESSION	= 	clusterizacion-kruskal-path-compression
+TARGET_CLUSTERIZACION_KRUSKAL					= 	clusterizacion-kruskal
+TARGET_CLUSTERIZACION_KRUSKAL_PATH_COMPRESSION	= 	clusterizacion-kruskal-path-compression
 TARGET_ARBITRAJE_BELLMAN_FORD					= 	arbitraje-bellman-ford
 TARGET_ARBITRAJE_FLOYD							= 	arbitraje-floyd
 

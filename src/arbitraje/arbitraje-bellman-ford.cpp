@@ -58,7 +58,7 @@ bool arbitrajeBellmanFord(vector<vector<double>> E, vector<int> *cicloDivisas, i
 
 		// Buscamos el ciclo negativo (que ya sabemos que existe) y, en particular, vamos a decir
 		// que cualquier nodo de ese ciclo va a ser el primer nodo del ciclo del arbitraje
-		
+
 		vector<bool> yaPase(n);
 		for (int i = 0; i < n; i++)
 			yaPase[i] = false;
@@ -114,7 +114,7 @@ int main()
 
 	// Convertimos la matriz de cambios de divisas a una matriz de sucesores para
 	// adaptarnos al modelo de grafo que usamos
-	vector<vector<double>> E = preProcesarDivisas(cambiosDivisas);
+	vector<vector<double>> E = currenciesToGraph(cambiosDivisas);
 
 	vector<int> cicloDivisas(0);
 	bool hayArbitraje = arbitrajeBellmanFord(E, &cicloDivisas, 0);

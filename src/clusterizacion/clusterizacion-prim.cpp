@@ -1,154 +1,139 @@
-#include<iostream>
-#include<vector>
-#include<set>
-#include<queue>
+#include <iostream>
+#include <vector>
+#include <tuple>
+#include <math.h>
+#include <climits>
+#include "../include/aux.hpp"
 
 using namespace std;
 
-class Edge {
-public:
-    int firstNode;
-    int secondNode;
-    int weight;
+// A utility function to find the vertex with
+// minimum key value, from the set of vertices
+// not yet included in MST
+int minKey(vector<double> key, vector<bool> mstSet)
+{
+    int n = key.size();
 
-    Edge(int firstNode_, int secondNode_, int weight_) {
-        secondNode = secondNode_;
-        firstNode = firstNode_;
-        weight = weight_;
-    }
-    ~Edge() {
-    }
+    // Initialize min value
+    int min = INT_MAX; // +inf
+    int min_index;
 
-    bool operator <(const Edge& other) const {
-        return weight < other.weight;
-    }
-
-    bool operator >(const Edge& other) const {
-        return weight > other.weight;
+    for (int v = 0; v < n; v++)
+    {
+        if (mstSet[v] == false && key[v] < min)
+            min = key[v], min_index = v;
     }
 
-};
-
-class edgesGreaterThan {
-public:
-    bool operator()(const Edge& l, const Edge& r) {
-        return l.weight > r.weight;
-    }
-};
-
-
-class Node {
-public:
-    ~Node() {}
-    Node() {}
-    Node(int id_) {id = id_;}
-
-    int id;
-    vector<Edge> edges;
-};
-
-bool edgeInBorder(Edge e, set<int> tree_nodes) {
-    if (tree_nodes.find(e.firstNode) != tree_nodes.end() && tree_nodes.find(e.secondNode) != tree_nodes.end()) {
-        return false;
-    }
-    if (tree_nodes.find(e.firstNode) != tree_nodes.end() || tree_nodes.find(e.secondNode) != tree_nodes.end()) {
-        return true;
-    }
-    return false; //Wextra
+    return min_index;
 }
 
-int selectNewNodeIndex(Edge e, set<int> tree_nodes) {
-    if (tree_nodes.find(e.firstNode) == tree_nodes.end()) {
-        return e.firstNode;
-    } else {
-        return e.secondNode;
-    }
-}
+vector<vector<double>> prim(vector<vector<double>> E)
+{
+    int n = E.size();
 
+    // Inicializo la matriz de adyacencia del AGM en +infinito (-1)
+    vector<vector<double>> res(n);
 
-void printQueue(priority_queue<Edge, std::vector<Edge>, edgesGreaterThan> edges) {
-
-
-    while (!edges.empty()) {
-        Edge e = edges.top();
-        cout << " from: " << e.firstNode << " to:  " << e.secondNode << " weight: " << e.weight << endl;
-        edges.pop();
-    }
-}
-
-Edge selectMinEdge(vector<Node> graph) {
-    Edge min_edge = graph[0].edges[0];
-    for (Node n : graph) {
-        for (Edge e : n.edges) {
-            if (e.weight < min_edge.weight)
-                min_edge = e;
+    for (int i = 0; i < n; i++)
+    {
+        res[i] = vector<double>(n);
+        for (int j = 0; j < n; j++)
+        {
+            res[i][j] = -1;
         }
     }
-    return min_edge;
-}
 
+    // Array to store constructed MST
+    vector<int> parent(n);
+    // Key values used to pick minimum weight edge in cut
+    vector<double> key(n);
+    // To represent set of vertices not yet included in MST
+    vector<bool> mstSet(n);
 
-set<Edge> prim(vector<Node> graph) {
-    set<int> tree_nodes;
-    set<Edge> tree_edges;
-
-    //Busco la minima arista y uno de sus nodos.
-    Edge min_edge = selectMinEdge(graph);
-    Node root_node = graph[min_edge.firstNode];
-    //Agrego la raiz junto con sus aristas.
-    tree_nodes.insert(root_node.id);
-    priority_queue<Edge, vector<Edge>, edgesGreaterThan> border_edges;
-    for (Edge e : root_node.edges)
-        border_edges.push(e);
-
-    while (tree_nodes.size() < graph.size()) {
-        cout << "ITER " << endl;
-        //for (int e : tree_nodes)
-        //    cout  << e <<  endl;
-        printQueue(border_edges);
-        //obtengo arista de menor peso
-        //Asumo que ya tengo las aristas de los dos nodos agregadas.
-        min_edge = border_edges.top();
-        border_edges.pop();
-        while (!edgeInBorder(min_edge, tree_nodes)) {
-            min_edge = border_edges.top();
-            border_edges.pop();
-        }
-        //agrego la nueva arista
-        tree_edges.insert(min_edge);
-        tree_nodes.insert(min_edge.secondNode);
-
-        int new_node_index = selectNewNodeIndex(min_edge, tree_nodes);
-        for (Edge e : graph[new_node_index].edges) {
-            if (edgeInBorder(e, tree_nodes)) border_edges.push(e);
-        }
-    }
-    return tree_edges;
-}
-
-using namespace std;
-
-int main() {
-    vector<Node> v;
-    for (int i = 0; i < 5; i++) {
-        v.push_back(Node(i));
+    // Initialize all keys as INFINITE
+    for (int i = 0; i < n; i++)
+    {
+        key[i] = INT_MAX;
+        mstSet[i] = false;
     }
 
-    v[0].edges.push_back(Edge(0, 1, 5));
-    v[1].edges.push_back(Edge(1, 0, 5));
-    v[0].edges.push_back(Edge(0, 4, 1));
-    v[4].edges.push_back(Edge(4, 0, 1));
-    v[1].edges.push_back(Edge(1, 2, 6));
-    v[2].edges.push_back(Edge(2, 1, 6));
-    v[1].edges.push_back(Edge(1, 3, 16));
-    v[3].edges.push_back(Edge(3, 1, 16));
-    v[2].edges.push_back(Edge(2, 3, 28));
-    v[3].edges.push_back(Edge(3, 2, 28));
-    v[2].edges.push_back(Edge(2, 4, 3));
-    v[4].edges.push_back(Edge(4, 2, 3));
+    // Always include first 1st vertex in MST.
+    // Make key 0 so that this vertex is picked as first vertex.
+    key[0] = 0;
+    parent[0] = -1; // First node is always root of MST
 
-    set<Edge> res = prim(v);
-    cout << "RES " << endl;
-    for (Edge e : res)
-        cout  << e.weight <<  endl;
+    // The MST will have V vertices
+    for (int count = 0; count < n - 1; count++)
+    {
+        // Pick the minimum key vertex from the
+        // set of vertices not yet included in MST
+        int u = minKey(key, mstSet);
+
+        // Add the picked vertex to the MST Set
+        mstSet[u] = true;
+
+        // Update key value and parent index of
+        // the adjacent vertices of the picked vertex.
+        // Consider only those vertices which are not
+        // yet included in MST
+        for (int v = 0; v < n; v++)
+        {
+            // graph[u][v] is non zero only for adjacent vertices of m
+            // mstSet[v] is false for vertices not yet included in MST
+            // Update the key only if graph[u][v] is smaller than key[v]
+            if (E[u][v] && mstSet[v] == false && E[u][v] < key[v])
+            {
+                parent[v] = u, key[v] = E[u][v];
+            }
+        }
+    }
+
+    for (int i = 0; i < parent.size(); i++)
+    {
+        int nodoPadre = parent[i];
+
+        if (nodoPadre != -1)
+        {
+            res[i][nodoPadre] = E[i][nodoPadre];
+            res[nodoPadre][i] = E[nodoPadre][i];
+        }
+    }
+
+    return res;
+}
+
+int main()
+{
+    int cantPuntos = 0;
+    cin >> cantPuntos;
+
+    if (cantPuntos < 0)
+    {
+        cerr << "La cantidad de puntos debe ser no negativa." << endl;
+        return -1;
+    }
+
+    vector<tuple<int, int>> coordenadas(cantPuntos);
+
+    // Leemos las coordenadas de cada punto por stdin
+    for (int i = 0; i < cantPuntos; i++)
+    {
+        int x, y;
+        cin >> x;
+        cin >> y;
+
+        coordenadas[i] = make_tuple(x, y);
+    }
+
+    // Modelaremos un grafo completo donde cada nodo será un punto del plano,
+    // y el peso de cada arista entre cada par de nodos será la distancia en el plano
+    // de los puntos que son representados por dichos nodos
+    // Representamos en grafo con una matriz de adyacencia
+    vector<vector<double>> E = pointsToGraph(coordenadas);
+
+    // Ejecutamos prim, que nos devuelve una matriz de adyacencia que representa un AGM
+    // del árbol que le pasamos.
+    vector<vector<double>> agm = prim(E);
+
+    return 0;
 }

@@ -11,7 +11,7 @@ bool arbitrajeFloyd(vector<vector<double>> E, vector<int> *cicloDivisas)
 {
     int n = E.size();
 
-    vector<vector<double>> distanciasMinimas(n);    // Matriz de distancias minimos entre cada par de nodos i,j
+    vector<vector<double>> distanciasMinimas(n); // Matriz de distancias minimos entre cada par de nodos i,j
     vector<vector<int>> next(n);
     int i, j, k;
 
@@ -52,7 +52,7 @@ bool arbitrajeFloyd(vector<vector<double>> E, vector<int> *cicloDivisas)
     {
         if (distanciasMinimas[i][i] < 0)
         {
-            // Hay ciclos negativos. Entonces hay arbitraje.            
+            // Hay ciclos negativos. Entonces hay arbitraje.
             hayArbitraje = true;
             nodoArbitraje = i;
             break;
@@ -105,7 +105,7 @@ int main()
 
     // Convertimos la matriz de cambios de divisas a una matriz de sucesores para
     // adaptarnos al modelo de grafo que usamos
-    vector<vector<double>> E = preProcesarDivisas(cambiosDivisas);
+    vector<vector<double>> E = currenciesToGraph(cambiosDivisas);
 
     vector<int> cicloDivisas(0);
     bool hayArbitraje = arbitrajeFloyd(E, &cicloDivisas);
