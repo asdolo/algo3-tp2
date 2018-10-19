@@ -12,13 +12,13 @@ using namespace std;
 // not yet included in MST
 int minKey(vector<double> key, vector<bool> mstSet)
 {
-    int n = key.size();
+    uint n = key.size();
 
     // Initialize min value
     int min = INT_MAX; // +inf
     int min_index;
 
-    for (int v = 0; v < n; v++)
+    for (uint v = 0; v < n; v++)
     {
         if (mstSet[v] == false && key[v] < min)
             min = key[v], min_index = v;
@@ -29,15 +29,15 @@ int minKey(vector<double> key, vector<bool> mstSet)
 
 vector<vector<double>> prim(vector<vector<double>> E)
 {
-    int n = E.size();
+    uint n = E.size();
 
     // Inicializo la matriz de adyacencia del AGM en +infinito (-1)
     vector<vector<double>> res(n);
 
-    for (int i = 0; i < n; i++)
+    for (uint i = 0; i < n; i++)
     {
         res[i] = vector<double>(n);
-        for (int j = 0; j < n; j++)
+        for (uint j = 0; j < n; j++)
         {
             res[i][j] = -1;
         }
@@ -51,7 +51,7 @@ vector<vector<double>> prim(vector<vector<double>> E)
     vector<bool> mstSet(n);
 
     // Initialize all keys as INFINITE
-    for (int i = 0; i < n; i++)
+    for (uint i = 0; i < n; i++)
     {
         key[i] = INT_MAX;
         mstSet[i] = false;
@@ -63,7 +63,7 @@ vector<vector<double>> prim(vector<vector<double>> E)
     parent[0] = -1; // First node is always root of MST
 
     // The MST will have V vertices
-    for (int count = 0; count < n - 1; count++)
+    for (uint count = 0; count < n - 1; count++)
     {
         // Pick the minimum key vertex from the
         // set of vertices not yet included in MST
@@ -76,7 +76,7 @@ vector<vector<double>> prim(vector<vector<double>> E)
         // the adjacent vertices of the picked vertex.
         // Consider only those vertices which are not
         // yet included in MST
-        for (int v = 0; v < n; v++)
+        for (uint v = 0; v < n; v++)
         {
             // graph[u][v] is non zero only for adjacent vertices of m
             // mstSet[v] is false for vertices not yet included in MST
@@ -88,7 +88,7 @@ vector<vector<double>> prim(vector<vector<double>> E)
         }
     }
 
-    for (int i = 0; i < parent.size(); i++)
+    for (uint i = 0; i < parent.size(); i++)
     {
         int nodoPadre = parent[i];
 
