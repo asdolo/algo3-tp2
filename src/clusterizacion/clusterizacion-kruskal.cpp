@@ -10,7 +10,7 @@ using namespace std;
 
 bool noPertenece(vector<tuple<int, int, int>> res, int x, int y)
 {
-    for (int i = 0; i < res.size(); i++)
+    for (uint i = 0; i < res.size(); i++)
     {
         if ((get<0>(res[i]) == x && get<1>(res[i]) == y) || (get<0>(res[i]) == y && get<1>(res[i]) == x))
             return false;
@@ -20,9 +20,9 @@ bool noPertenece(vector<tuple<int, int, int>> res, int x, int y)
 vector<tuple<int, int, int>> obtenerListaDeAristas(vector<vector<double>> E)
 {
     vector<tuple<int, int, int>> res;
-    for (int i = 0; i < E[0].size(); i++)
+    for (uint i = 0; i < E[0].size(); i++)
     {
-        for (int j = 0; j < E[0].size(); j++)
+        for (uint j = 0; j < E[0].size(); j++)
         {
             if (E[i][j] != -1 && noPertenece(res, i, j) && i != j)
             {
@@ -46,7 +46,7 @@ int FIND(int u, vector<int> &representantes)
 void UNION(int u, int v, vector<int> &representantes)
 {
     int x = representantes[v];
-    for (int i = 0; i < representantes.size(); i++)
+    for (uint i = 0; i < representantes.size(); i++)
     {
         if (representantes[i] == x)
             representantes[i] = representantes[u];
@@ -56,7 +56,7 @@ vector<vector<double>> kruskal(vector<vector<double>> E)
 {
     vector<int> representantes;
     //Creo el vector de representantes
-    for (int i = 0; i < E[0].size(); i++)
+    for (uint i = 0; i < E[0].size(); i++)
     {
         representantes.push_back(i);
     }
@@ -65,7 +65,7 @@ vector<vector<double>> kruskal(vector<vector<double>> E)
     vector<tuple<int, int, int>> listaDeAristas = obtenerListaDeAristas(E);
     sort(listaDeAristas.begin(), listaDeAristas.end(), sortbyth);
 
-    for (int i = 0; i < listaDeAristas.size(); i++)
+    for (uint i = 0; i < listaDeAristas.size(); i++)
     {
         tuple<int, int, int> arista = listaDeAristas[i];
         if (FIND(get<0>(arista), representantes) != FIND(get<1>(arista), representantes))
@@ -76,7 +76,7 @@ vector<vector<double>> kruskal(vector<vector<double>> E)
     }
     //Ya tengo el AGM en res. Lo paso a matriz de adyacencia
     vector<vector<double>> res(E[0].size(), vector<double>(E[0].size(), -1));
-    for (int i = 0; i < agm.size(); i++)
+    for (uint i = 0; i < agm.size(); i++)
     {
         tuple<int, int, int> arista = agm[i];
         res[get<0>(arista)][get<1>(arista)] = get<2>(arista);
@@ -109,7 +109,7 @@ int main(int argc, const char* argv[])
     vector<tuple<int, int>> coordenadas(cantPuntos);
 
     // Leemos las coordenadas de cada punto por stdin
-    for (int i = 0; i < cantPuntos; i++)
+    for (uint i = 0; i < cantPuntos; i++)
     {
         int x, y;
         cin >> x;
