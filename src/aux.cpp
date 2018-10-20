@@ -6,13 +6,13 @@ using namespace std;
 
 // Ejercicio 1
 
-vector<vector<double>> pointsToGraph(vector<tuple<int, int>> points)
+vector< vector<double> > pointsToGraph(vector< tuple<int, int>> points)
 {
     // Obtengo la cantidad de nodos
     int n = points.size();
 
     // Inicializo la matriz de adyacencia en 0
-    vector<vector<double>> res(n);
+    vector< vector<double> > res(n);
 
     for (int i = 0; i < n; i++)
     {
@@ -68,7 +68,7 @@ double standardDeviation(vector<double> arr, int n)
     return sqrt(variance(arr, n));
 }
 
-void obtenerVecinosN(vector<vector<double>> agm, int nodoA, int nodoB, int n, vector<double> &res, double &sumatoria)
+void obtenerVecinosN(vector< vector<double> > agm, int nodoA, int nodoB, int n, vector<double> &res, double &sumatoria)
 {
     if (n == 0)
     {
@@ -85,7 +85,7 @@ void obtenerVecinosN(vector<vector<double>> agm, int nodoA, int nodoB, int n, ve
     }
 }
 
-bool isConsistentEdge(vector<vector<double>> agm, int nodoA, int nodoB, int vecindad, int version = 1, double excesoNecesarioDesvioEstandar = 3, double ratioExceso = 2)
+bool isConsistentEdge(vector< vector<double> > agm, int nodoA, int nodoB, int vecindad, int version, double excesoNecesarioDesvioEstandar, double ratioExceso)
 {
     vector<double> distanciasVecinosNodoA;
     double sumatoriaNodoA = 0;
@@ -114,11 +114,11 @@ bool isConsistentEdge(vector<vector<double>> agm, int nodoA, int nodoB, int veci
 
 // Convierte la matriz de divisas a una matriz de sucesores donde cada posición (i,j) es el peso de la arista
 // entre los nodos i y j del grafo dirigido que modela el problema de arbitraje
-vector<vector<double>> currenciesToGraph(vector<vector<double>> currencies)
+vector< vector<double> > currenciesToGraph(vector< vector<double> > currencies)
 {
     int n = currencies.size();
 
-    vector<vector<double>> weights(n);
+    vector< vector<double> > weights(n);
 
     for (int i = 0; i < n; i++)
     {
@@ -134,7 +134,7 @@ vector<vector<double>> currenciesToGraph(vector<vector<double>> currencies)
 
 // General
 
-void printMatriz(vector<vector<double>> matriz)
+void printMatriz(vector< vector<double> > matriz)
 {
     for (int i = 0; i < matriz.size(); i++)
     {
@@ -144,4 +144,58 @@ void printMatriz(vector<vector<double>> matriz)
         }
         cout << endl;
     }
+}
+bool todosVisitados(vector<bool> visitados){
+    
+    for(int i = 0; i < visitados.size(); i++)
+    {
+        if(!visitados[i]) return false;
+    }
+    
+}
+void definirCluster(vector< vector<double> > grafo,vector< int >& result,vector<bool>& visitados,int i,int nroCluster){
+    for(int j=0;j<grafo.size();j++){
+        if(i!=j && grafo[i][j]!=-1 && visitados[j]==false){
+            visitados[j]=true;
+            result[j]=nroCluster;
+        }
+    }
+
+}
+vector< int > obtenerClusters(vector< vector<double> > agm,int vecindad,int version,double excesoNecesarioDesvioEstandar,double ratioExceso){
+    vector< tuple<int, int > > ejesInconsistentes;
+    for(int i=0;i<agm[0].size();i++){
+        for(int j=0;j<agm[0].size();j++){
+            if(i!=j && agm[i][j]!=-1 && isConsistentEdge(agm,i,j,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso)){
+                tuple<int,int> inconsistente;
+                get<0>(inconsistente)=i;
+                get<1>(inconsistente)=j;
+                ejesInconsistentes.push_back(inconsistente);
+            }
+        }
+    }
+    
+
+    //Ya tengo los ejes inconsistentes(Algunos repetidos pero no hay problema)
+    //Saco los ejes inconsistentes del agm. Quedan n componentes conexas
+    for(int i=0;i<ejesInconsistentes.size();i++){
+        agm[get<0>(ejesInconsistentes[i])][get<1>(ejesInconsistentes[i])]=-1;
+        agm[get<1>(ejesInconsistentes[i])][get<0>(ejesInconsistentes[i])]=-1;
+    }
+
+    //agm solamente tiene n componentes conexas, donde cada componente conexa es un cluster
+    //Para obtener que punto pertenece a cada cluster veo los vecinos
+    vector< int > puntosPertencienteACluster(agm.size(),-1);
+    vector<bool> visitados(agm.size(),false);
+    int nroCluster=0;
+    for(int i=0;i<visitados.size();i++){
+        if(visitados[i] == false){
+            visitados[i]=true;
+            puntosPertencienteACluster[i] = nroCluster;
+            definirCluster(agm,puntosPertencienteACluster,visitados,i,nroCluster);
+            nroCluster++;
+        }
+    }
+    return puntosPertencienteACluster;
+    
 }

@@ -27,12 +27,12 @@ int minKey(vector<double> key, vector<bool> mstSet)
     return min_index;
 }
 
-vector<vector<double>> prim(vector<vector<double>> E)
+vector< vector<double> > prim(vector< vector<double> > E)
 {
     int n = E.size();
 
     // Inicializo la matriz de adyacencia del AGM en +infinito (-1)
-    vector<vector<double>> res(n);
+    vector< vector<double> > res(n);
 
     for (int i = 0; i < n; i++)
     {
@@ -102,8 +102,18 @@ vector<vector<double>> prim(vector<vector<double>> E)
     return res;
 }
 
-int main()
+int main(int argc, const char* argv[])
 {
+    int vecindad=2; 
+    int version=1; 
+    double excesoNecesarioDesvioEstandar=3;
+    double ratioExceso=2;
+    if(argc>4){
+		vecindad=stoi(argv[1]); 
+        version= stoi(argv[2]); 
+        excesoNecesarioDesvioEstandar = stod(argv[3]);
+        ratioExceso = stod(argv[4]);
+	}
     int cantPuntos = 0;
     cin >> cantPuntos;
 
@@ -113,7 +123,7 @@ int main()
         return -1;
     }
 
-    vector<tuple<int, int>> coordenadas(cantPuntos);
+    vector< tuple<int, int > > coordenadas(cantPuntos);
 
     // Leemos las coordenadas de cada punto por stdin
     for (int i = 0; i < cantPuntos; i++)
@@ -129,11 +139,15 @@ int main()
     // y el peso de cada arista entre cada par de nodos será la distancia en el plano
     // de los puntos que son representados por dichos nodos
     // Representamos en grafo con una matriz de adyacencia
-    vector<vector<double>> E = pointsToGraph(coordenadas);
+    vector< vector<double> > E = pointsToGraph(coordenadas);
 
     // Ejecutamos prim, que nos devuelve una matriz de adyacencia que representa un AGM
     // del árbol que le pasamos.
-    vector<vector<double>> agm = prim(E);
-
+    vector< vector<double> > agm = prim(E);
+    vector<int> res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
+    for(int i=0;i<res.size();i++){
+        cout << res[i] << endl;
+    }
+    
     return 0;
 }

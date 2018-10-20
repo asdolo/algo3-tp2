@@ -108,8 +108,18 @@ vector<vector<double>> kruskalPathCompression(vector<vector<double>> E)
     return res;
 }
 
-int main()
+int main(int argc, const char* argv[])
 {
+    int vecindad=2; 
+    int version=1; 
+    double excesoNecesarioDesvioEstandar=3;
+    double ratioExceso=2;
+    if(argc>4){
+		vecindad=stoi(argv[1]); 
+        version= stoi(argv[2]); 
+        excesoNecesarioDesvioEstandar = stod(argv[3]);
+        ratioExceso = stod(argv[4]);
+	}
     int cantPuntos = 0;
     cin >> cantPuntos;
 
@@ -141,6 +151,9 @@ int main()
     // del árbol que le pasamos.
     vector<vector<double>> agm = kruskalPathCompression(E);
 
-    
+    vector<int> res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
+    for(int i=0;i<res.size();i++){
+        cout << res[i] << endl;
+    }
     return 0;
 }
