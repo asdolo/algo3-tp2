@@ -3,6 +3,9 @@
 #include <tuple>
 #include <math.h>
 #include <climits>
+#include <fstream>
+#include <sstream>
+#include <chrono>
 #include "../include/aux.hpp"
 
 using namespace std;
@@ -27,12 +30,12 @@ int minKey(vector<double> key, vector<bool> mstSet)
     return min_index;
 }
 
-vector< vector<double> > prim(vector< vector<double> > E)
+vector<vector<double>> prim(vector<vector<double>> E)
 {
     uint n = E.size();
 
     // Inicializo la matriz de adyacencia del AGM en +infinito (-1)
-    vector< vector<double> > res(n);
+    vector<vector<double>> res(n);
 
     for (uint i = 0; i < n; i++)
     {
@@ -102,18 +105,19 @@ vector< vector<double> > prim(vector< vector<double> > E)
     return res;
 }
 
-int main(int argc, const char* argv[])
+int main(int argc, char *argv[])
 {
-    int vecindad=2; 
-    int version=1; 
-    double excesoNecesarioDesvioEstandar=3;
-    double ratioExceso=2;
-    if(argc>4){
-		vecindad=stoi(argv[1]); 
-        version= stoi(argv[2]); 
-        excesoNecesarioDesvioEstandar = stod(argv[3]);
-        ratioExceso = stod(argv[4]);
-	}
+    int vecindad = 2;
+    int version = 1;
+    double excesoNecesarioDesvioEstandar = 3;
+    double ratioExceso = 2;
+    if (argc >= 6)
+    {
+        vecindad = stoi(argv[2]);
+        version = stoi(argv[3]);
+        excesoNecesarioDesvioEstandar = stod(argv[4]);
+        ratioExceso = stod(argv[5]);
+    }
     int cantPuntos = 0;
     cin >> cantPuntos;
 
@@ -123,7 +127,12 @@ int main(int argc, const char* argv[])
         return -1;
     }
 
-    vector< tuple<int, int > > coordenadas(cantPuntos);
+    ofstream myFile;
+    stringstream fileName;
+    fileName << "output/clusterizacion" << (argc >= 2 ? argv[1] : "prim.csv");
+    myFile.open(fileName.str(), ios_base::app);
+
+    vector<tuple<int, int>> coordenadas(cantPuntos);
 
     // Leemos las coordenadas de cada punto por stdin
     for (int i = 0; i < cantPuntos; i++)
@@ -139,15 +148,23 @@ int main(int argc, const char* argv[])
     // y el peso de cada arista entre cada par de nodos será la distancia en el plano
     // de los puntos que son representados por dichos nodos
     // Representamos en grafo con una matriz de adyacencia
-    vector< vector<double> > E = pointsToGraph(coordenadas);
+    vector<vector<double>> E = pointsToGraph(coordenadas);
 
     // Ejecutamos prim, que nos devuelve una matriz de adyacencia que representa un AGM
     // del árbol que le pasamos.
-    vector< vector<double> > agm = prim(E);
+    vector<vector<double>> agm = prim(E);
     vector<int> res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
-    for(int i=0;i<res.size();i++){
+    for (uint i = 0; i < res.size(); i++)
+    {
         cout << res[i] << endl;
     }
-    
+
+    // Guardamos la salida en un archivo csv para graficar
+    for (int i = 0; i < cantPuntos; i++)
+    {
+        myFile << i << "," << get<0>(coordenadas[i]) << "," << get<1>(coordenadas[i]) << "," << res[i] << endl;
+    }
+    myFile.close();
+
     return 0;
 }

@@ -4,6 +4,9 @@
 #include <iostream>
 #include <tuple>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <chrono>
 #include "../include/aux.hpp"
 
 using namespace std;
@@ -85,18 +88,19 @@ vector<vector<double>> kruskal(vector<vector<double>> E)
     return res;
 }
 
-int main(int argc, const char* argv[])
+int main(int argc, const char *argv[])
 {
-    int vecindad=2; 
-    int version=1; 
-    double excesoNecesarioDesvioEstandar=3;
-    double ratioExceso=2;
-    if(argc>4){
-		vecindad=stoi(argv[1]); 
-        version= stoi(argv[2]); 
-        excesoNecesarioDesvioEstandar = stod(argv[3]);
-        ratioExceso = stod(argv[4]);
-	}
+    int vecindad = 2;
+    int version = 1;
+    double excesoNecesarioDesvioEstandar = 3;
+    double ratioExceso = 2;
+    if (argc >= 6)
+    {
+        vecindad = stoi(argv[2]);
+        version = stoi(argv[3]);
+        excesoNecesarioDesvioEstandar = stod(argv[4]);
+        ratioExceso = stod(argv[5]);
+    }
     int cantPuntos = 0;
     cin >> cantPuntos;
 
@@ -106,10 +110,15 @@ int main(int argc, const char* argv[])
         return -1;
     }
 
+    ofstream myFile;
+	stringstream fileName;
+	fileName << "output/clusterizacion" << (argc >= 2 ? argv[1] : "kruskal.csv");
+    myFile.open(fileName.str(), ios_base::app);
+
     vector<tuple<int, int>> coordenadas(cantPuntos);
 
     // Leemos las coordenadas de cada punto por stdin
-    for (uint i = 0; i < cantPuntos; i++)
+    for (int i = 0; i < cantPuntos; i++)
     {
         int x, y;
         cin >> x;
@@ -128,8 +137,17 @@ int main(int argc, const char* argv[])
     // del árbol que le pasamos.
     vector<vector<double>> agm = kruskal(E);
     vector<int> res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
-    for(int i=0;i<res.size();i++){
+    for (uint i = 0; i < res.size(); i++)
+    {
         cout << res[i] << endl;
     }
+
+    // Guardamos la salida en un archivo csv para graficar
+    for (int i = 0; i < cantPuntos; i++)
+    {
+        myFile << i << "," << get<0>(coordenadas[i]) << "," << get<1>(coordenadas[i]) << "," << res[i] << endl;
+    }
+    myFile.close();
+
     return 0;
 }

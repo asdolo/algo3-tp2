@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <chrono>
 #include "../include/aux.hpp"
 
 using namespace std;
@@ -88,7 +91,7 @@ bool arbitrajeBellmanFord(vector<vector<double>> E, vector<int> *cicloDivisas, i
 	return hayArbitraje;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 
 	int cantDivisas = 0;
@@ -99,6 +102,11 @@ int main()
 		cerr << "La cantidad de divisas debe ser no negativa." << endl;
 		return -1;
 	}
+
+	ofstream myFile;
+	stringstream fileName;
+	fileName << "output/arbitraje" << (argc >= 2 ? argv[1] : "bellman-ford.csv");
+	myFile.open(fileName.str(), ios_base::app);
 
 	vector<vector<double>> cambiosDivisas(cantDivisas);
 
@@ -117,13 +125,16 @@ int main()
 	vector<vector<double>> E = currenciesToGraph(cambiosDivisas);
 
 	vector<int> cicloDivisas(0);
-	bool hayArbitraje = arbitrajeBellmanFord(E, &cicloDivisas, 0);
+	bool hayArbitraje;
+	auto startTime = chrono::steady_clock::now();
+	hayArbitraje = arbitrajeBellmanFord(E, &cicloDivisas, 0);
+	auto endTime = chrono::steady_clock::now();
 
 	if (hayArbitraje)
 	{
 		cout << "SI";
 
-		for (int i = 0; i < cicloDivisas.size(); i++)
+		for (uint i = 0; i < cicloDivisas.size(); i++)
 		{
 			cout << " " << cicloDivisas[i];
 		}
@@ -134,6 +145,18 @@ int main()
 	}
 
 	cout << endl;
+
+	// Guardamos la salida en un archivo csv para graficar
+	myFile << cantDivisas << "," << (hayArbitraje ? "SI" : "NO") << ",";
+
+	cout << cicloDivisas[0];
+	for (uint i = 1; i < cicloDivisas.size(); i++)
+	{
+		cout << "-" << cicloDivisas[i];
+	}
+
+	myFile << "," << chrono::duration<double, milli>(endTime - startTime).count() << endl;
+	myFile.close();
 
 	return 0;
 }
