@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 
     ofstream myFile;
     stringstream fileName;
-    fileName << "output/clusterizacion" << (argc >= 2 ? argv[1] : "prim.csv");
+    fileName << "output/clusterizacion/" << (argc >= 2 ? argv[1] : "prim.csv");
     myFile.open(fileName.str(), ios_base::app);
 
     vector<tuple<int, int>> coordenadas(cantPuntos);

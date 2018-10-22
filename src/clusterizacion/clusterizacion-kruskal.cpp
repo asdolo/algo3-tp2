@@ -112,7 +112,7 @@ int main(int argc, const char *argv[])
 
     ofstream myFile;
 	stringstream fileName;
-	fileName << "output/clusterizacion" << (argc >= 2 ? argv[1] : "kruskal.csv");
+	fileName << "output/clusterizacion/" << (argc >= 2 ? argv[1] : "kruskal.csv");
     myFile.open(fileName.str(), ios_base::app);
 
     vector<tuple<int, int>> coordenadas(cantPuntos);
