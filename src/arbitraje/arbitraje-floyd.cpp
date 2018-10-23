@@ -64,11 +64,22 @@ bool arbitrajeFloyd(vector<vector<double>> E, vector<int> *cicloDivisas)
 
     // Si detectamos que hay arbitraje, devolvemos true y reconstruimos un ciclo que sea solución
     // Si, no devolvemos false
-
+    
     if (hayArbitraje)
     {
-        int i = nodoArbitraje;
+        vector<bool> yaPase(n);
+		for (int i = 0; i < n; i++)
+			yaPase[i] = false;
+        
+        int actual = nodoArbitraje;
+		do
+		{
+			yaPase[actual] = true;
+			actual = next[nodoArbitraje][actual];
+		} while (!yaPase[actual]);
 
+		nodoArbitraje = actual;
+        int i = nodoArbitraje;
         do
         {
             (*cicloDivisas).push_back(i);
@@ -96,7 +107,7 @@ int main(int argc, char *argv[])
 
     ofstream myFile;
     stringstream fileName;
-    fileName << "output/arbitraje/" << (argc >= 2 ? argv[1] : "floyd.csv");
+    fileName << (argc >= 2 ? argv[1] : "floyd.csv");
     myFile.open(fileName.str(), ios_base::app);
 
     vector<vector<double>> cambiosDivisas(cantDivisas);

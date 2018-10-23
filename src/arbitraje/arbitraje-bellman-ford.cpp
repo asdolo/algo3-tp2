@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
 	ofstream myFile;
 	stringstream fileName;
-	fileName << "output/arbitraje/" << (argc >= 2 ? argv[1] : "bellman-ford.csv");
+	fileName << (argc >= 2 ? argv[1] : "bellman-ford.csv");
 	myFile.open(fileName.str(), ios_base::app);
 
 	vector<vector<double>> cambiosDivisas(cantDivisas);
