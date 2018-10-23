@@ -158,7 +158,7 @@ void definirCluster(vector<vector<double>> grafo, vector<int> &result, vector<bo
         }
     }
 }
-vector<int> obtenerClusters(vector<vector<double>> agm, int vecindad, int version, double excesoNecesarioDesvioEstandar, double ratioExceso)
+tuple<vector<int>, int> obtenerClusters(vector<vector<double>> agm, int vecindad, int version, double excesoNecesarioDesvioEstandar, double ratioExceso)
 {
     vector<tuple<int, int>> ejesInconsistentes;
     for (uint i = 0; i < agm[0].size(); i++)
@@ -198,5 +198,5 @@ vector<int> obtenerClusters(vector<vector<double>> agm, int vecindad, int versio
             nroCluster++;
         }
     }
-    return puntosPertencienteACluster;
+    return tuple<vector<int>, int>(puntosPertencienteACluster, nroCluster);
 }

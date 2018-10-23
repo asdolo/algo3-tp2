@@ -111,19 +111,25 @@ vector<vector<double>> kruskalPathCompression(vector<vector<double>> E)
     return res;
 }
 
-int main(int argc, const char *argv[])
+/*
+ Argumentos:
+    1. Archivo .csv donde se va a guardar cada punto y a qué clúster pertenece.
+    2. Archivo .csv donde se va a agregar una línea que indique la cantidad de puntos,
+        los parámetros del test (vecindad, version, excesoNecesarioDesvioEstandar y ratioExceso),
+        la cantidad de clústers resultantes y el tiempo de ejecución del algoritmo.
+    3. Tamaño de la vencindad a tener en cuenta para definir si un eje es inconsistente.
+    4. Versión de noción de eje inconsistente a utilizar (valor entre 1 y 2)
+    5. Cantidad de veces que debe exceder el peso de un eje con respecto al desvió estándar
+        de su vecindad para considerarse inconsistente (versión 1).
+    6. Ratio que debe exceder un eje para considerarse inconsistente (versión 2).
+*/
+int main(int argc, char *argv[])
 {
-    int vecindad = 2;
-    int version = 1;
-    double excesoNecesarioDesvioEstandar = 3;
-    double ratioExceso = 2;
-    if (argc >= 6)
-    {
-        vecindad = stoi(argv[2]);
-        version = stoi(argv[3]);
-        excesoNecesarioDesvioEstandar = stod(argv[4]);
-        ratioExceso = stod(argv[5]);
-    }
+    int vecindad = argc >= 4 ? stoi(argv[3]) : 2;
+    int version = argc >= 5 ? stoi(argv[4]) : 1;
+    double excesoNecesarioDesvioEstandar = argc >= 6 ? stod(argv[5]) : 3;
+    double ratioExceso = argc >= 7 ? stod(argv[6]) : 2;
+    
     int cantPuntos = 0;
     cin >> cantPuntos;
 
@@ -133,10 +139,10 @@ int main(int argc, const char *argv[])
         return -1;
     }
 
-    ofstream myFile;
-    stringstream fileName;
-    fileName << "output/clusterizacion/" << (argc >= 2 ? argv[1] : "kruskal-path-compression.csv");
-    myFile.open(fileName.str(), ios_base::app);
+    ofstream archivoTablaClusters;
+    ofstream archivoResultados;
+    archivoTablaClusters.open(argc >= 2 ? argv[1] : "output/clusterizacion/clusters-kruskal-path-compression.csv", ios_base::app);
+    archivoResultados.open(argc >= 3 ? argv[2] : "output/clusterizacion/mediciones-kruskal-path-compression.csv", ios_base::app);
 
     vector<tuple<int, int>> coordenadas(cantPuntos);
 
@@ -158,20 +164,31 @@ int main(int argc, const char *argv[])
 
     // Ejecutamos kruskal con path compression, que nos devuelve una matriz de adyacencia que representa un AGM
     // del árbol que le pasamos.
-    vector<vector<double>> agm = kruskalPathCompression(E);
+    vector<vector<double>> agm;
+    auto startTime = chrono::steady_clock::now();
+    agm = kruskalPathCompression(E);
+    auto endTime = chrono::steady_clock::now();
+    
+    tuple<vector<int>, int> res;
+    
+    auto startTime2 = chrono::steady_clock::now();
+    res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
+    auto endTime2 = chrono::steady_clock::now();
 
-    vector<int> res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
-    for (uint i = 0; i < res.size(); i++)
+    for (uint i = 0; i < get<0>(res).size(); i++)
     {
-        cout << res[i] << endl;
+        cout << get<0>(res)[i] << endl;
     }
 
-    // Guardamos la salida en un archivo csv para graficar
+    // Guardamos las salidas en los archivos .csv
     for (int i = 0; i < cantPuntos; i++)
     {
-        myFile << i << "," << get<0>(coordenadas[i]) << "," << get<1>(coordenadas[i]) << "," << res[i] << endl;
+        archivoTablaClusters << i << "," << get<0>(coordenadas[i]) << "," << get<1>(coordenadas[i]) << "," << get<0>(res)[i] << endl;
     }
-    myFile.close();
+    archivoTablaClusters.close();
+
+    archivoResultados << cantPuntos << "," << vecindad << "," << version << "," << excesoNecesarioDesvioEstandar << "," << ratioExceso << "," << get<1>(res) << "," << chrono::duration<double, milli>((endTime - startTime) + (endTime2 - startTime2)).count() << endl;
+    archivoResultados.close();
 
     return 0;
 }
