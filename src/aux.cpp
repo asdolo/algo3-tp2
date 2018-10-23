@@ -87,19 +87,19 @@ void obtenerVecinosN(vector<vector<double>> agm, uint nodoA, uint nodoB, uint n,
 
 bool isConsistentEdge(vector<vector<double>> agm, int nodoA, int nodoB, int vecindad, int version, double excesoNecesarioDesvioEstandar, double ratioExceso)
 {
-    vector<double> distanciasVecinosNodoA;
+    vector<double> distanciasVecinosNodoA(0);
     double sumatoriaNodoA = 0;
     obtenerVecinosN(agm, nodoA, nodoB, vecindad, distanciasVecinosNodoA, sumatoriaNodoA);
-    vector<double> distanciasVecinosNodoB;
+    vector<double> distanciasVecinosNodoB(0);
     double sumatoriaNodoB = 0;
     obtenerVecinosN(agm, nodoB, nodoA, vecindad, distanciasVecinosNodoB, sumatoriaNodoB);
-    double promedioA = sumatoriaNodoA / distanciasVecinosNodoA.size();
-    double promedioB = sumatoriaNodoB / distanciasVecinosNodoB.size();
+    double promedioA = (distanciasVecinosNodoA.size() > 0 ? sumatoriaNodoA / distanciasVecinosNodoA.size() : 0);
+    double promedioB = (distanciasVecinosNodoB.size() > 0 ? sumatoriaNodoB / distanciasVecinosNodoB.size() : 0);
     double desvioEstandarA = standardDeviation(distanciasVecinosNodoA, distanciasVecinosNodoA.size());
     double desvioEstandarB = standardDeviation(distanciasVecinosNodoB, distanciasVecinosNodoB.size());
     double distanciaEntreAyB = agm[nodoA][nodoB];
-    double excesoDeInconsistenciaA = distanciaEntreAyB / desvioEstandarA;
-    double excesoDeInconsistenciaB = distanciaEntreAyB / desvioEstandarB;
+    double excesoDeInconsistenciaA = (desvioEstandarA != 0 ? distanciaEntreAyB / desvioEstandarA : 0);
+    double excesoDeInconsistenciaB = (desvioEstandarB != 0 ? distanciaEntreAyB / desvioEstandarB : 0);
     double ratioA = distanciaEntreAyB / promedioA;
     double ratioB = distanciaEntreAyB / promedioB;
     if (version == 1)
@@ -154,6 +154,7 @@ void definirCluster(vector<vector<double>> grafo, vector<int> &result, vector<bo
         {
             visitados[j] = true;
             result[j] = nroCluster;
+            definirCluster(grafo, result, visitados, j, nroCluster);
         }
     }
 }
