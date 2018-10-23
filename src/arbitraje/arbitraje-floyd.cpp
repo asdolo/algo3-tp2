@@ -141,12 +141,14 @@ int main(int argc, char *argv[])
     // Guardamos la salida en un archivo csv para graficar
     myFile << cantDivisas << "," << (hayArbitraje ? "SI" : "NO") << ",";
 
-    myFile << cicloDivisas[0];
-    for (uint i = 1; i < cicloDivisas.size(); i++)
-    {
-        myFile << "-" << cicloDivisas[i];
+    if (hayArbitraje){
+        
+        myFile << cicloDivisas[0];
+        for (uint i = 1; i < cicloDivisas.size(); i++)
+        {
+            myFile << "-" << cicloDivisas[i];
+        }
     }
-
     myFile << "," << chrono::duration<double, milli>(endTime - startTime).count() << endl;
     myFile.close();
 
