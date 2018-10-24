@@ -85,18 +85,19 @@ void obtenerVecinosN(vector<vector<double>> agm, uint nodoA, uint nodoB, uint n,
     }
 }
 
+//O(N^2)
 bool isConsistentEdge(vector<vector<double>> agm, int nodoA, int nodoB, int vecindad, int version, double excesoNecesarioDesvioEstandar, double ratioExceso)
 {
     vector<double> distanciasVecinosNodoA(0);
     double sumatoriaNodoA = 0;
-    obtenerVecinosN(agm, nodoA, nodoB, vecindad, distanciasVecinosNodoA, sumatoriaNodoA);
+    obtenerVecinosN(agm, nodoA, nodoB, vecindad, distanciasVecinosNodoA, sumatoriaNodoA); //O(N^2)
     vector<double> distanciasVecinosNodoB(0);
     double sumatoriaNodoB = 0;
-    obtenerVecinosN(agm, nodoB, nodoA, vecindad, distanciasVecinosNodoB, sumatoriaNodoB);
+    obtenerVecinosN(agm, nodoB, nodoA, vecindad, distanciasVecinosNodoB, sumatoriaNodoB);//O(N^2)
     double promedioA = (distanciasVecinosNodoA.size() > 0 ? sumatoriaNodoA / distanciasVecinosNodoA.size() : 0);
     double promedioB = (distanciasVecinosNodoB.size() > 0 ? sumatoriaNodoB / distanciasVecinosNodoB.size() : 0);
-    double desvioEstandarA = standardDeviation(distanciasVecinosNodoA, distanciasVecinosNodoA.size());
-    double desvioEstandarB = standardDeviation(distanciasVecinosNodoB, distanciasVecinosNodoB.size());
+    double desvioEstandarA = standardDeviation(distanciasVecinosNodoA, distanciasVecinosNodoA.size());//O(N)
+    double desvioEstandarB = standardDeviation(distanciasVecinosNodoB, distanciasVecinosNodoB.size());//O(N)
     double distanciaEntreAyB = agm[nodoA][nodoB];
     double excesoDeInconsistenciaA = (desvioEstandarA != 0 ? distanciaEntreAyB / desvioEstandarA : 0);
     double excesoDeInconsistenciaB = (desvioEstandarB != 0 ? distanciaEntreAyB / desvioEstandarB : 0);
@@ -158,26 +159,41 @@ void definirCluster(vector<vector<double>> grafo, vector<int> &result, vector<bo
         }
     }
 }
-tuple<vector<int>, int> obtenerClusters(vector<vector<double>> agm, int vecindad, int version, double excesoNecesarioDesvioEstandar, double ratioExceso)
+vector<tuple<int, int, int>> obtenerListaDeAristas(vector<vector<double>> E)
 {
-    vector<tuple<int, int>> ejesInconsistentes;
-    for (uint i = 0; i < agm[0].size(); i++)
+    vector<tuple<int, int, int>> res;
+    for (uint i = 0; i < E[0].size(); i++) //O(N^2)
     {
-        for (uint j = 0; j < agm[0].size(); j++)
+        for (uint j = i+1; j < E[0].size(); j++)
         {
-            if (i != j && agm[i][j] != -1 && isConsistentEdge(agm, i, j, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso))
+            if (E[i][j] != -1 && i != j)
             {
-                tuple<int, int> inconsistente;
-                get<0>(inconsistente) = i;
-                get<1>(inconsistente) = j;
-                ejesInconsistentes.push_back(inconsistente);
+                tuple<int, int, int> t{i, j, E[i][j]};
+                res.push_back(t);
             }
         }
     }
+    return res;
+}
+//O(N^3)
+tuple<vector<int>, int> obtenerClusters(vector<vector<double>> agm, int vecindad, int version, double excesoNecesarioDesvioEstandar, double ratioExceso)
+{
+    vector<tuple<int, int>> ejesInconsistentes;
+    vector<tuple<int,int,int>> listaDeAristas = obtenerListaDeAristas(agm);//O(N^2)
+    for (uint i = 0; i < listaDeAristas.size(); i++) //O(N^3)
+    {
+            if (isConsistentEdge(agm, get<0>(listaDeAristas[i]), get<1>(listaDeAristas[i]), vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso))
+            {
+                tuple<int, int> inconsistente;
+                get<0>(inconsistente) = get<0>(listaDeAristas[i]);
+                get<1>(inconsistente) = get<1>(listaDeAristas[i]);
+                ejesInconsistentes.push_back(inconsistente);
+            }
+        
+    }
 
-    //Ya tengo los ejes inconsistentes(Algunos repetidos pero no hay problema)
-    //Saco los ejes inconsistentes del agm. Quedan n componentes conexas
-    for (uint i = 0; i < ejesInconsistentes.size(); i++)
+    //Saco los ejes inconsistentes del agm. Quedan x componentes conexas
+    for (uint i = 0; i < ejesInconsistentes.size(); i++) //O(N) caso que todos los ejes sean inconsistentes, es un arbol.
     {
         agm[get<0>(ejesInconsistentes[i])][get<1>(ejesInconsistentes[i])] = -1;
         agm[get<1>(ejesInconsistentes[i])][get<0>(ejesInconsistentes[i])] = -1;
@@ -188,13 +204,13 @@ tuple<vector<int>, int> obtenerClusters(vector<vector<double>> agm, int vecindad
     vector<int> puntosPertencienteACluster(agm.size(), -1);
     vector<bool> visitados(agm.size(), false);
     int nroCluster = 0;
-    for (uint i = 0; i < visitados.size(); i++)
+    for (uint i = 0; i < visitados.size(); i++) //O(N^3)
     {
         if (visitados[i] == false)
         {
             visitados[i] = true;
             puntosPertencienteACluster[i] = nroCluster;
-            definirCluster(agm, puntosPertencienteACluster, visitados, i, nroCluster);
+            definirCluster(agm, puntosPertencienteACluster, visitados, i, nroCluster);//O(N^2)
             nroCluster++;
         }
     }

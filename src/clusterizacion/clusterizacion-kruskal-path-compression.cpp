@@ -25,23 +25,7 @@ bool noPertenece(vector<tuple<int, int, int>> res, int x, int y)
     }
     return true;
 }
-vector<tuple<int, int, int>> obtenerListaDeAristas(vector<vector<double>> E)
-{
-    vector<tuple<int, int, int>> res;
-    for (uint i = 0; i < E[0].size(); i++)
-    {
-        for (uint j = 0; j < E[0].size(); j++)
-        {
-            if (E[i][j] != -1 && noPertenece(res, i, j) && i != j)
-            {
-                tuple<int, int, int> t{i, j, E[i][j]};
-                res.push_back(t);
-            }
-        }
-    }
 
-    return res;
-}
 bool sortbyth(const tuple<int, int, int> &a,
               const tuple<int, int, int> &b)
 {
@@ -172,7 +156,7 @@ int main(int argc, char *argv[])
     tuple<vector<int>, int> res;
     
     auto startTime2 = chrono::steady_clock::now();
-    res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
+    res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);//O(N^3)
     auto endTime2 = chrono::steady_clock::now();
 
     for (uint i = 0; i < get<0>(res).size(); i++)

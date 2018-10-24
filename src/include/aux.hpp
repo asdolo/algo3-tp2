@@ -19,5 +19,5 @@ vector<vector<double>> currenciesToGraph(vector<vector<double>> currencies);
 
 // General
 void printMatriz(vector<vector<double>> matriz);
-
+vector<tuple<int, int, int>> obtenerListaDeAristas(vector<vector<double>> E);
 #endif

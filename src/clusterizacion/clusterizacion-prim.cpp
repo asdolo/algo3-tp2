@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
     tuple<vector<int>, int> res;
     
     auto startTime2 = chrono::steady_clock::now();
-    res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
+    res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);//O(N^3)
     auto endTime2 = chrono::steady_clock::now();
 
     for (uint i = 0; i < get<0>(res).size(); i++)

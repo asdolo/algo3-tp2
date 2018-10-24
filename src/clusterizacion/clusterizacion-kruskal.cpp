@@ -11,31 +11,7 @@
 
 using namespace std;
 
-bool noPertenece(vector<tuple<int, int, int>> res, int x, int y)
-{
-    for (uint i = 0; i < res.size(); i++)
-    {
-        if ((get<0>(res[i]) == x && get<1>(res[i]) == y) || (get<0>(res[i]) == y && get<1>(res[i]) == x))
-            return false;
-    }
-    return true;
-}
-vector<tuple<int, int, int>> obtenerListaDeAristas(vector<vector<double>> E)
-{
-    vector<tuple<int, int, int>> res;
-    for (uint i = 0; i < E[0].size(); i++)
-    {
-        for (uint j = 0; j < E[0].size(); j++)
-        {
-            if (E[i][j] != -1 && noPertenece(res, i, j) && i != j)
-            {
-                tuple<int, int, int> t{i, j, E[i][j]};
-                res.push_back(t);
-            }
-        }
-    }
-    return res;
-}
+
 bool sortbyth(const tuple<int, int, int> &a,
               const tuple<int, int, int> &b)
 {
@@ -59,16 +35,16 @@ vector<vector<double>> kruskal(vector<vector<double>> E)
 {
     vector<int> representantes;
     //Creo el vector de representantes
-    for (uint i = 0; i < E[0].size(); i++)
+    for (uint i = 0; i < E[0].size(); i++) //O(N)
     {
         representantes.push_back(i);
     }
 
     vector<tuple<int, int, int>> agm;
-    vector<tuple<int, int, int>> listaDeAristas = obtenerListaDeAristas(E);
-    sort(listaDeAristas.begin(), listaDeAristas.end(), sortbyth);
+    vector<tuple<int, int, int>> listaDeAristas = obtenerListaDeAristas(E);//O(N^2)
+    sort(listaDeAristas.begin(), listaDeAristas.end(), sortbyth);//O(N LOG(N))
 
-    for (uint i = 0; i < listaDeAristas.size(); i++)
+    for (uint i = 0; i < listaDeAristas.size(); i++)//O(N^3)
     {
         tuple<int, int, int> arista = listaDeAristas[i];
         if (FIND(get<0>(arista), representantes) != FIND(get<1>(arista), representantes))
@@ -78,7 +54,7 @@ vector<vector<double>> kruskal(vector<vector<double>> E)
         }
     }
     //Ya tengo el AGM en res. Lo paso a matriz de adyacencia
-    vector<vector<double>> res(E[0].size(), vector<double>(E[0].size(), -1));
+    vector<vector<double>> res(E[0].size(), vector<double>(E[0].size(), -1)); //O(N)
     for (uint i = 0; i < agm.size(); i++)
     {
         tuple<int, int, int> arista = agm[i];
@@ -143,13 +119,13 @@ int main(int argc, char *argv[])
     // del árbol que le pasamos.
     vector<vector<double>> agm;
     auto startTime = chrono::steady_clock::now();
-    agm = kruskal(E);
+    agm = kruskal(E);//O(N^3)
     auto endTime = chrono::steady_clock::now();
     
     tuple<vector<int>, int> res;
     
     auto startTime2 = chrono::steady_clock::now();
-    res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);
+    res = obtenerClusters(agm, vecindad, version, excesoNecesarioDesvioEstandar, ratioExceso);//O(N^3)
     auto endTime2 = chrono::steady_clock::now();
 
     for (uint i = 0; i < get<0>(res).size(); i++)
