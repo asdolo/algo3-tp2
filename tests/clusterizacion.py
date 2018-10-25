@@ -84,6 +84,7 @@ check_compiled('clusterizacion-kruskal-path-compression')
 # Ejecutar test segun parametro
 if parametro == '1':
     # Test 1:
+    # Complejidad usando version 1 y parametros por default
     # Prim vs Kruskal vs Kruskal con Path Compression
 
     # Limpio los outputs viejos del test
@@ -132,6 +133,143 @@ if parametro == '1':
             output = p.communicate(os.linesep.join([input]))[0]
             
 
+elif parametro == '2':
+    # Test 2:
+    # N=400,version=1 , modifico los parametros para obtener la clusterizacion mas similar al ojo humano
+    # Prim vs Kruskal vs Kruskal con Path Compression
+    # Limpio los outputs viejos del test
+    limpiar_output('../output/clusterizacion/test-2-clusters-prim-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-2-clusters-kruskal-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-2-clusters-kruskal-path-compression-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-2-mediciones-prim.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-2-mediciones-kruskal.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-2-mediciones-kruskal-path-compression.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    # Voy agregando puntos
+    n=400
+    f = open('../input/clusterizacion/s1.txt', 'r')
+    input = str(n) + '\n'
+    # Genero los inputs que van a ir al stdin por un pipe
+    for i in range(0, n):
+        input += f.readline() + '\n'
+
+    f.close()
+    for vec in range(1,11):
+        for exceso in range(1,11):
+            for algoritmo in ['prim', 'kruskal', 'kruskal-path-compression']:
+                limpiar_output('../output/clusterizacion/test-2-clusters-' + algoritmo + '-400-puntos.csv', 'punto,x,y,cluster')
+                # Genero los parametros del algoritmo
+                archivoTablaClusters            = '../output/clusterizacion/test-2-clusters-' + algoritmo + '-400-puntos.csv'
+                archivoResultados               = '../output/clusterizacion/test-2-mediciones-' + algoritmo + '.csv'
+                vecindad                        = vec
+                version                         = 1
+                excesoNecesarioDesvioEstandar   = exceso
+                ratioExceso                     = 2
+
+                parametros = archivoTablaClusters + ' '
+                parametros += archivoResultados + ' '
+                parametros += str(vecindad) + ' '
+                parametros += str(version) + ' '
+                parametros += str(excesoNecesarioDesvioEstandar) + ' '
+                parametros += str(ratioExceso) + ' '
+
+                print('Ejecutando ' + algoritmo + ' con n = ' + str(n))
+                print('Parametros: ' + parametros)
+                
+                p = Popen('../clusterizacion-' + algoritmo + ' ' + parametros, stdin=PIPE, stdout=PIPE, shell=True)
+                output = p.communicate(os.linesep.join([input]))[0]
+elif parametro == '3':
+    # Test 3:
+    # N=400,version=2 , modifico los parametros para obtener la clusterizacion mas similar al ojo humano
+    # Prim vs Kruskal vs Kruskal con Path Compression
+    # Limpio los outputs viejos del test
+    limpiar_output('../output/clusterizacion/test-3-clusters-prim-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-3-clusters-kruskal-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-3-clusters-kruskal-path-compression-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-3-mediciones-prim.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-3-mediciones-kruskal.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-3-mediciones-kruskal-path-compression.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    # Voy agregando puntos
+    n=400
+    f = open('../input/clusterizacion/s1.txt', 'r')
+    input = str(n) + '\n'
+    # Genero los inputs que van a ir al stdin por un pipe
+    for i in range(0, n):
+        input += f.readline() + '\n'
+
+    f.close()
+    for vec in range(1,11):
+        for exceso in range(1,11):
+            for algoritmo in ['prim', 'kruskal', 'kruskal-path-compression']:
+                limpiar_output('../output/clusterizacion/test-3-clusters-' + algoritmo + '-400-puntos.csv', 'punto,x,y,cluster')
+                # Genero los parametros del algoritmo
+                archivoTablaClusters            = '../output/clusterizacion/test-3-clusters-' + algoritmo + '-400-puntos.csv'
+                archivoResultados               = '../output/clusterizacion/test-3-mediciones-' + algoritmo + '.csv'
+                vecindad                        = vec
+                version                         = 2
+                excesoNecesarioDesvioEstandar   = 2
+                ratioExceso                     = exceso
+
+                parametros = archivoTablaClusters + ' '
+                parametros += archivoResultados + ' '
+                parametros += str(vecindad) + ' '
+                parametros += str(version) + ' '
+                parametros += str(excesoNecesarioDesvioEstandar) + ' '
+                parametros += str(ratioExceso) + ' '
+
+                print('Ejecutando ' + algoritmo + ' con n = ' + str(n))
+                print('Parametros: ' + parametros)
+                
+                p = Popen('../clusterizacion-' + algoritmo + ' ' + parametros, stdin=PIPE, stdout=PIPE, shell=True)
+                output = p.communicate(os.linesep.join([input]))[0]    
+elif parametro == '4':
+    # Test 4:
+    # Igual que test 1 pero con version=2
+    # Prim vs Kruskal vs Kruskal con Path Compression
+
+    # Limpio los outputs viejos del test
+    limpiar_output('../output/clusterizacion/test-4-clusters-prim-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-4-clusters-kruskal-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-4-clusters-kruskal-path-compression-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-4-mediciones-prim.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-4-mediciones-kruskal.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-4-mediciones-kruskal-path-compression.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+
+
+    # Voy agregando puntos
+    for n in range(0, 400 + 5, 5):
+        f = open('../input/clusterizacion/s1.txt', 'r')
+        
+        input = str(n) + '\n'
+        
+        # Genero los inputs que van a ir al stdin por un pipe
+        for i in range(0, n):
+            input += f.readline() + '\n'
+
+        f.close()
+
+        for algoritmo in ['prim', 'kruskal', 'kruskal-path-compression']:
+            limpiar_output('../output/clusterizacion/test-4-clusters-' + algoritmo + '-400-puntos.csv', 'punto,x,y,cluster')
+        
+            # Genero los parametros del algoritmo
+            archivoTablaClusters            = '../output/clusterizacion/test-4-clusters-' + algoritmo + '-400-puntos.csv'
+            archivoResultados               = '../output/clusterizacion/test-4-mediciones-' + algoritmo + '.csv'
+            vecindad                        = 2
+            version                         = 2
+            excesoNecesarioDesvioEstandar   = 3
+            ratioExceso                     = 2
+
+            parametros = archivoTablaClusters + ' '
+            parametros += archivoResultados + ' '
+            parametros += str(vecindad) + ' '
+            parametros += str(version) + ' '
+            parametros += str(excesoNecesarioDesvioEstandar) + ' '
+            parametros += str(ratioExceso) + ' '
+
+            print('Ejecutando ' + algoritmo + ' con n = ' + str(n))
+            print('Parametros: ' + parametros)
+            
+            p = Popen('../clusterizacion-' + algoritmo + ' ' + parametros, stdin=PIPE, stdout=PIPE, shell=True)
+            output = p.communicate(os.linesep.join([input]))[0]
 else:
     print_modo_de_uso()
     exit()    
