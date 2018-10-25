@@ -270,6 +270,92 @@ elif parametro == '4':
             
             p = Popen('../clusterizacion-' + algoritmo + ' ' + parametros, stdin=PIPE, stdout=PIPE, shell=True)
             output = p.communicate(os.linesep.join([input]))[0]
+elif parametro == '5':
+    # Test 5 igual que el 2 pero con a1.txt y SOLO PRIM:
+    # N=400,version=1 , modifico los parametros para obtener la clusterizacion mas similar al ojo humano
+    # Limpio los outputs viejos del test
+    limpiar_output('../output/clusterizacion/test-5-clusters-prim-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-5-clusters-kruskal-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-5-clusters-kruskal-path-compression-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-5-mediciones-prim.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-5-mediciones-kruskal.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-5-mediciones-kruskal-path-compression.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    # Voy agregando puntos
+    n=400
+    f = open('../input/clusterizacion/a1.txt', 'r')
+    input = str(n) + '\n'
+    # Genero los inputs que van a ir al stdin por un pipe
+    for i in range(0, n):
+        input += f.readline() + '\n'
+
+    f.close()
+    for vec in range(1,11):
+        for exceso in range(1,11):
+            for algoritmo in ['prim']:
+                limpiar_output('../output/clusterizacion/test-5-clusters-' + algoritmo + '-400-puntos.csv', 'punto,x,y,cluster')
+                # Genero los parametros del algoritmo
+                archivoTablaClusters            = '../output/clusterizacion/test-5-clusters-' + algoritmo + '-400-puntos.csv'
+                archivoResultados               = '../output/clusterizacion/test-5-mediciones-' + algoritmo + '.csv'
+                vecindad                        = vec
+                version                         = 1
+                excesoNecesarioDesvioEstandar   = exceso
+                ratioExceso                     = 2
+
+                parametros = archivoTablaClusters + ' '
+                parametros += archivoResultados + ' '
+                parametros += str(vecindad) + ' '
+                parametros += str(version) + ' '
+                parametros += str(excesoNecesarioDesvioEstandar) + ' '
+                parametros += str(ratioExceso) + ' '
+
+                print('Ejecutando ' + algoritmo + ' con n = ' + str(n))
+                print('Parametros: ' + parametros)
+                
+                p = Popen('../clusterizacion-' + algoritmo + ' ' + parametros, stdin=PIPE, stdout=PIPE, shell=True)
+                output = p.communicate(os.linesep.join([input]))[0]
+elif parametro == '6':
+    # Test 6 igual que el 3 pero con a1.txt y SOLO PRIM:
+    # N=400,version=2 , modifico los parametros para obtener la clusterizacion mas similar al ojo humano
+    # Limpio los outputs viejos del test
+    limpiar_output('../output/clusterizacion/test-6-clusters-prim-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-6-clusters-kruskal-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-6-clusters-kruskal-path-compression-400-puntos.csv', 'punto,x,y,cluster')
+    limpiar_output('../output/clusterizacion/test-6-mediciones-prim.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-6-mediciones-kruskal.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    limpiar_output('../output/clusterizacion/test-6-mediciones-kruskal-path-compression.csv', 'n,vecindad,version,excesoNecesarioDesvioEstandar,ratioExceso,clusters,tiempo')
+    # Voy agregando puntos
+    n=400
+    f = open('../input/clusterizacion/a1.txt', 'r')
+    input = str(n) + '\n'
+    # Genero los inputs que van a ir al stdin por un pipe
+    for i in range(0, n):
+        input += f.readline() + '\n'
+
+    f.close()
+    for vec in range(1,11):
+        for exceso in range(1,11):
+            for algoritmo in ['prim']:
+                limpiar_output('../output/clusterizacion/test-6-clusters-' + algoritmo + '-400-puntos.csv', 'punto,x,y,cluster')
+                # Genero los parametros del algoritmo
+                archivoTablaClusters            = '../output/clusterizacion/test-6-clusters-' + algoritmo + '-400-puntos.csv'
+                archivoResultados               = '../output/clusterizacion/test-6-mediciones-' + algoritmo + '.csv'
+                vecindad                        = vec
+                version                         = 2
+                excesoNecesarioDesvioEstandar   = 2
+                ratioExceso                     = exceso
+
+                parametros = archivoTablaClusters + ' '
+                parametros += archivoResultados + ' '
+                parametros += str(vecindad) + ' '
+                parametros += str(version) + ' '
+                parametros += str(excesoNecesarioDesvioEstandar) + ' '
+                parametros += str(ratioExceso) + ' '
+
+                print('Ejecutando ' + algoritmo + ' con n = ' + str(n))
+                print('Parametros: ' + parametros)
+                
+                p = Popen('../clusterizacion-' + algoritmo + ' ' + parametros, stdin=PIPE, stdout=PIPE, shell=True)
+                output = p.communicate(os.linesep.join([input]))[0] 
 else:
     print_modo_de_uso()
     exit()    
